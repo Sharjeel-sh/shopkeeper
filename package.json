@@ -1,5 +1,13 @@
 {
-  "dependencies": {
-    "mongoose": "^9.3.1"
+  "name": "udhaar-tracker",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Udhaar Tracker monorepo: React frontend + Express/MongoDB backend, deployed on Firebase (Hosting + Functions)",
+  "scripts": {
+    "install:all": "npm install --prefix backend && npm install --prefix frontend && npm install --prefix functions",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "build:frontend": "npm run build --prefix frontend",
+    "deploy": "npm run build:frontend && firebase deploy"
   }
 }
