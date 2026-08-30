@@ -2,6 +2,8 @@
 
 Simple, mobile-first web app for small shopkeepers to track udhaar (credit), payments, and pending balances.
 
+Deploy target: **https://freelancegrowth.mrtoner.pk/** (Firebase Hosting + Cloud Functions, custom domain)
+
 ## 1) Project Structure
 
 ```text
@@ -116,14 +118,14 @@ Base URL: `http://localhost:5000/api`
 
 ## Requirements
 - Node.js 18+
-- MongoDB running locally
+- A MongoDB connection (local `mongod`, or a free MongoDB Atlas cluster)
 
 ### A) Start Backend
 1. Open terminal:
    ```bash
    cd backend
    npm install
-   cp .env.example .env
+   cp .env.example .env   # fill in MONGODB_URI and JWT_SECRET
    npm run dev
    ```
 2. Backend runs at `http://localhost:5000`
@@ -137,6 +139,35 @@ Base URL: `http://localhost:5000/api`
    npm run dev
    ```
 2. Frontend runs at `http://localhost:5173`
+
+Or from the repo root: `npm run install:all` then `npm run dev:backend` / `npm run dev:frontend` in separate terminals.
+
+## 7) Deployment (Firebase Hosting + Cloud Functions)
+
+The app deploys as a single Firebase project:
+- **Hosting** serves the built React app (`frontend/dist`).
+- **Cloud Functions** (`functions/`) wraps the same Express API used locally (`backend/src/app.js`) behind an HTTPS function named `api`.
+- Hosting rewrites `/api/**` to that function, so the frontend and backend share one domain with no CORS setup needed.
+
+### One-time setup
+```bash
+npm install -g firebase-tools
+firebase login
+```
+Confirm `.firebaserc` points at your Firebase project ID (currently `udhaar-tracker-8ea9e`).
+
+Create `functions/.env` (copy `functions/.env.example`) with:
+- `MONGODB_URI` — a MongoDB Atlas connection string (Cloud Functions can't reach a `localhost` Mongo instance)
+- `JWT_SECRET` — a long random string
+
+### Deploy
+```bash
+npm run deploy
+```
+This builds the frontend, copies `backend/src` into `functions/backend` (via the `predeploy` hook in `firebase.json`), and runs `firebase deploy` (Hosting + Functions).
+
+### Connect the custom domain
+In the Firebase console → Hosting → **Add custom domain** → `freelancegrowth.mrtoner.pk`, then add the DNS records Firebase gives you at your domain registrar. HTTPS is provisioned automatically once DNS verifies.
 
 ## Beginner Notes
 
